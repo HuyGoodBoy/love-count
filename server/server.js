@@ -15,11 +15,37 @@ if (process.env.NODE_ENV === 'production') {
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Middleware
-app.use(cors());  // Cho phép tất cả các origin tạm thời để test
+// CORS Configuration
+const corsOptions = {
+    origin: ['https://lover.huygoodboy.io.vn', 'http://localhost:3000'],
+    methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
+    optionsSuccessStatus: 200
+};
 
-// Thêm middleware xử lý preflight requests
-app.options('*', cors());
+// Apply CORS middleware with options
+app.use(cors(corsOptions));
+
+// Handle preflight requests
+app.options('*', cors(corsOptions));
+
+// Request logging middleware
+app.use((req, res, next) => {
+    console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+    console.log('Origin:', req.headers.origin);
+    console.log('Headers:', req.headers);
+    next();
+});
+
+// Add security and CORS headers middleware
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', req.headers.origin);
+    res.header('Access-Control-Allow-Methods', 'GET,POST,DELETE,OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.header('Access-Control-Allow-Credentials', true);
+    next();
+});
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../')));
