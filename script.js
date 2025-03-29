@@ -248,20 +248,49 @@ function handleImageUpload(event) {
     }
 }
 
-function deleteMemory(id) {
-    console.log('Deleting memory:', id);
-    fetch(`${API_URL}/memories/${id}`, {
-        method: 'DELETE'
-    })
-    .then(response => response.json())
-    .then(() => {
-        memories = memories.filter(memory => memory.id !== id);
+async function deleteMemory(id) {
+    console.log('Attempting to delete memory:', id);
+    
+    // Prevent multiple delete attempts
+    const deleteBtn = document.querySelector(`.memory-item[data-id="${id}"] .delete-btn`);
+    if (deleteBtn) {
+        deleteBtn.disabled = true;
+        deleteBtn.style.opacity = '0.5';
+    }
+
+    try {
+        const response = await fetch(`${API_URL}/memories/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        console.log('Delete response status:', response.status);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+        console.log('Delete result:', result);
+
+        // Remove the memory from the array and update display
+        memories = memories.filter(memory => memory._id !== id);
         displayMemories();
-    })
-    .catch(error => {
+        
+        // Show success message
+        alert('Đã xóa ảnh thành công');
+    } catch (error) {
         console.error('Error deleting memory:', error);
-        alert('Có lỗi xảy ra khi xóa ảnh');
-    });
+        alert('Có lỗi xảy ra khi xóa ảnh. Vui lòng thử lại sau.');
+        
+        // Re-enable delete button on error
+        if (deleteBtn) {
+            deleteBtn.disabled = false;
+            deleteBtn.style.opacity = '1';
+        }
+    }
 }
 
 function getTimeElapsed(uploadDate) {

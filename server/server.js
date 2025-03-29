@@ -222,22 +222,42 @@ app.post('/api/memories', upload.single('image'), async (req, res) => {
 // Delete memory
 app.delete('/api/memories/:id', async (req, res) => {
     try {
+        console.log('Attempting to delete memory with ID:', req.params.id);
+        
         const memory = await Memory.findById(req.params.id);
         if (!memory) {
+            console.log('Memory not found:', req.params.id);
             return res.status(404).json({ message: 'Không tìm thấy ảnh' });
         }
         
-        // Delete file from uploads folder
-        const filePath = path.join(__dirname, memory.image);
+        console.log('Found memory:', memory);
+        
+        // Extract filename from the full URL
+        const imageUrl = memory.image;
+        const filename = imageUrl.split('/').pop();
+        const filePath = path.join(__dirname, 'uploads', filename);
+        
+        console.log('Attempting to delete file:', filePath);
+        
+        // Delete file if it exists
         if (fs.existsSync(filePath)) {
             fs.unlinkSync(filePath);
+            console.log('File deleted successfully');
+        } else {
+            console.log('File not found on disk:', filePath);
         }
         
-        await Memory.deleteOne({ _id: req.params.id });
+        // Delete from database
+        const result = await Memory.findByIdAndDelete(req.params.id);
+        console.log('Database delete result:', result);
+        
         res.json({ message: 'Đã xóa ảnh thành công' });
     } catch (error) {
         console.error('Delete error:', error);
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ 
+            message: 'Có lỗi xảy ra khi xóa ảnh',
+            error: error.message 
+        });
     }
 });
 
