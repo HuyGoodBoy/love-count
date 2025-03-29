@@ -294,11 +294,20 @@ function displayMemories() {
         item.replaceWith(item.cloneNode(true));
     });
 
+    const placeholderSvg = `data:image/svg+xml,${encodeURIComponent(`
+        <svg width="300" height="300" xmlns="http://www.w3.org/2000/svg">
+            <rect width="100%" height="100%" fill="#f0f0f0"/>
+            <text x="50%" y="50%" font-family="Arial" font-size="20" fill="#666" text-anchor="middle">
+                Ảnh không khả dụng
+            </text>
+        </svg>
+    `)}`;
+
     grid.innerHTML = memories.map(memory => `
         <div class="memory-item" data-id="${memory._id}">
             <img src="${memory.image}" 
                 alt="Kỷ niệm" 
-                onerror="this.onerror=null; this.src='https://love-count.onrender.com/placeholder.svg'; console.error('Failed to load image:', this.src);"
+                onerror="this.onerror=null; this.src='${placeholderSvg}'"
                 loading="lazy">
             <button class="delete-btn" onclick="event.stopPropagation(); deleteMemory('${memory._id}')">×</button>
             <div class="time-elapsed">${getTimeElapsed(memory.uploadDate)}</div>
