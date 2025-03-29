@@ -24,6 +24,9 @@ let memories = JSON.parse(localStorage.getItem('memories')) || [];
 // Thêm biến cho modal
 let modal, modalImage, modalDate, modalTime, closeModal;
 
+// Thêm biến cho API URL
+const API_URL = window.location.origin + '/api';
+
 // Khởi tạo các biến khi DOM đã sẵn sàng
 document.addEventListener('DOMContentLoaded', function() {
     modal = document.getElementById('imageModal');
@@ -200,39 +203,40 @@ function handleImageUpload(event) {
 
     for (let file of files) {
         if (file.type.startsWith('image/')) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const memory = {
-                    id: Date.now().toString(),
-                    image: e.target.result,
-                    date: new Date().toLocaleDateString('vi-VN'),
-                    uploadDate: new Date().toISOString()
-                };
+            const formData = new FormData();
+            formData.append('image', file);
+
+            fetch(`${API_URL}/memories`, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(memory => {
                 memories.push(memory);
-                saveMemories();
                 displayMemories();
-            };
-            reader.readAsDataURL(file);
+            })
+            .catch(error => {
+                console.error('Error uploading image:', error);
+                alert('Có lỗi xảy ra khi upload ảnh');
+            });
         }
     }
 }
 
 function deleteMemory(id) {
     console.log('Deleting memory:', id);
-    console.log('Before deletion:', memories);
-    memories = memories.filter(memory => memory.id !== id);
-    console.log('After deletion:', memories);
-    saveMemories();
-    displayMemories();
-}
-
-function saveMemories() {
-    try {
-        localStorage.setItem('memories', JSON.stringify(memories));
-        console.log('Memories saved:', memories);
-    } catch (error) {
-        console.error('Error saving memories:', error);
-    }
+    fetch(`${API_URL}/memories/${id}`, {
+        method: 'DELETE'
+    })
+    .then(response => response.json())
+    .then(() => {
+        memories = memories.filter(memory => memory.id !== id);
+        displayMemories();
+    })
+    .catch(error => {
+        console.error('Error deleting memory:', error);
+        alert('Có lỗi xảy ra khi xóa ảnh');
+    });
 }
 
 function getTimeElapsed(uploadDate) {
@@ -265,20 +269,10 @@ function displayMemories() {
         item.replaceWith(item.cloneNode(true));
     });
 
-    // Lấy dữ liệu mới nhất từ localStorage
-    try {
-        const savedMemories = JSON.parse(localStorage.getItem('memories')) || [];
-        if (JSON.stringify(savedMemories) !== JSON.stringify(memories)) {
-            memories = savedMemories;
-        }
-    } catch (error) {
-        console.error('Error loading memories:', error);
-    }
-
     grid.innerHTML = memories.map(memory => `
-        <div class="memory-item" data-id="${memory.id}">
+        <div class="memory-item" data-id="${memory._id}">
             <img src="${memory.image}" alt="Kỷ niệm">
-            <button class="delete-btn" onclick="event.stopPropagation(); deleteMemory('${memory.id}')">×</button>
+            <button class="delete-btn" onclick="event.stopPropagation(); deleteMemory('${memory._id}')">×</button>
             <div class="time-elapsed">${getTimeElapsed(memory.uploadDate)}</div>
             <div class="date">${memory.date}</div>
         </div>
@@ -287,7 +281,6 @@ function displayMemories() {
     // Thêm sự kiện click cho mỗi memory-item
     const memoryItems = document.querySelectorAll('.memory-item');
     console.log('Found memory items:', memoryItems.length);
-    console.log('Current memories:', memories);
     
     memoryItems.forEach(item => {
         item.addEventListener('click', function(e) {
@@ -303,7 +296,7 @@ function displayMemories() {
 function openImageModal(memoryId) {
     console.log('Opening modal for memory:', memoryId);
     console.log('Available memories:', memories);
-    const memory = memories.find(m => m.id === memoryId);
+    const memory = memories.find(m => m._id === memoryId);
     if (!memory) {
         console.log('Memory not found:', memoryId);
         return;
@@ -328,6 +321,20 @@ function openImageModal(memoryId) {
     console.log('Modal should be visible now');
 }
 
+// Thêm hàm loadMemories
+function loadMemories() {
+    fetch(`${API_URL}/memories`)
+        .then(response => response.json())
+        .then(data => {
+            memories = data;
+            displayMemories();
+        })
+        .catch(error => {
+            console.error('Error loading memories:', error);
+            alert('Có lỗi xảy ra khi tải ảnh');
+        });
+}
+
 // Cập nhật hàm window.onload
 window.onload = function() {
     const savedDate = localStorage.getItem('loveStartDate');
@@ -341,5 +348,5 @@ window.onload = function() {
     updateCounter();
     timer = setInterval(updateCounter, 1000);
     updateImportantDates();
-    displayMemories();
+    loadMemories();
 }; 

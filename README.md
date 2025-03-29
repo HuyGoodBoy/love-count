@@ -35,3 +35,10 @@ python -m http.server 8000
 ## Tác giả
 
 Huy & Thảo 
+
+## Cài đặt MongoDB driver
+
+```bash
+cd server
+npm install mongodb
+``` 

@@ -8,6 +8,22 @@ venv/
 env/
 ENV/
 
+# Node.js
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Environment variables
+.env
+# But keep production env
+!.env.production
+!.env.example
+
+# Uploads directory
+server/uploads/*
+!server/uploads/.gitkeep
+
 # IDE
 .vscode/
 .idea/
