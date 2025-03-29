@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đếm Ngày Yêu - Huy & Thảo</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div class="tabs">
+            <button class="tab-btn active" onclick="showTab('counter')">Đếm Ngày Yêu</button>
+            <button class="tab-btn" onclick="showTab('important-dates')">Ngày Quan Trọng</button>
+            <button class="tab-btn" onclick="showTab('memories')">Ảnh Kỷ Niệm</button>
+        </div>
+
+        <div class="tab-content" id="counter-tab">
+            <div class="love-card">
+                <h1>Đếm Ngày Yêu</h1>
+                <div class="couple-profiles">
+                    <div class="profile">
+                        <img src="images/huy.jpg" alt="Bùi Gia Huy" class="profile-image">
+                        <div class="profile-info">
+                            <span class="name">Bùi Gia Huy</span>
+                            <span class="birth-date">28/11/2004</span>
+                        </div>
+                    </div>
+                    <span class="heart">❤</span>
+                    <div class="profile">
+                        <img src="images/thao.jpg" alt="Giang Phương Thảo" class="profile-image">
+                        <div class="profile-info">
+                            <span class="name">Giang Phương Thảo</span>
+                            <span class="birth-date">09/11/2006</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="date-input">
+                    <input type="date" id="startDate" value="2023-03-17">
+                    <button onclick="calculateLoveDays()">Tính</button>
+                </div>
+                <div class="result" id="result">
+                    <div class="days">
+                        <span id="daysCount">0</span>
+                        <p>Ngày</p>
+                    </div>
+                    <div class="hours">
+                        <span id="hoursCount">0</span>
+                        <p>Giờ</p>
+                    </div>
+                    <div class="minutes">
+                        <span id="minutesCount">0</span>
+                        <p>Phút</p>
+                    </div>
+                    <div class="seconds">
+                        <span id="secondsCount">0</span>
+                        <p>Giây</p>
+                    </div>
+                </div>
+                <div class="love-message" id="loveMessage">
+                    Chúng ta đã yêu nhau được...
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="important-dates-tab" style="display: none;">
+            <div class="love-card">
+                <h1>Ngày Quan Trọng</h1>
+                <div class="important-dates">
+                    <div class="date-category">
+                        <h2>Ngày Kỷ Niệm</h2>
+                        <div class="date-list" id="anniversary-dates">
+                            <!-- Sẽ được điền bởi JavaScript -->
+                        </div>
+                    </div>
+                    <div class="date-category">
+                        <h2>Ngày Lễ</h2>
+                        <div class="date-list" id="holiday-dates">
+                            <!-- Sẽ được điền bởi JavaScript -->
+                        </div>
+                    </div>
+                    <div class="date-category">
+                        <h2>Sinh Nhật</h2>
+                        <div class="date-list" id="birthday-dates">
+                            <!-- Sẽ được điền bởi JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="memories-tab" style="display: none;">
+            <div class="love-card">
+                <h1>Ảnh Kỷ Niệm</h1>
+                <div class="upload-section">
+                    <div class="upload-box" id="uploadBox">
+                        <input type="file" id="imageInput" accept="image/*" multiple style="display: none" onchange="handleImageUpload(event)">
+                        <div class="upload-content" onclick="document.getElementById('imageInput').click()">
+                            <span class="upload-icon">📸</span>
+                            <p>Click để thêm ảnh kỷ niệm</p>
+                            <p class="upload-hint">(Hỗ trợ nhiều ảnh cùng lúc)</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="memories-grid" id="memoriesGrid">
+                    <!-- Ảnh kỷ niệm sẽ được thêm vào đây -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal cho xem ảnh phóng to -->
+    <div id="imageModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <img id="modalImage" src="" alt="Ảnh kỷ niệm">
+            <div class="modal-info">
+                <div class="modal-date"></div>
+                <div class="modal-time"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html> 
