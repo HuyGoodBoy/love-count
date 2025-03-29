@@ -27,7 +27,7 @@ let modal, modalImage, modalDate, modalTime, closeModal;
 // Thêm biến cho API URL
 const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
     ? window.location.origin + '/api'
-    : 'https://count-love-day-api.onrender.com/api';  // URL của Render
+    : 'https://count-love-day-api.onrender.com/api';  // Đảm bảo URL này chính xác
 
 // Khởi tạo các biến khi DOM đã sẵn sàng
 document.addEventListener('DOMContentLoaded', function() {
