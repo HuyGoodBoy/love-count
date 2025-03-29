@@ -298,7 +298,7 @@ function displayMemories() {
         <div class="memory-item" data-id="${memory._id}">
             <img src="${memory.image}" 
                 alt="Kỷ niệm" 
-                onerror="this.onerror=null; this.src='placeholder.jpg'; console.error('Failed to load image:', this.src);"
+                onerror="this.onerror=null; this.src='https://love-count.onrender.com/placeholder.svg'; console.error('Failed to load image:', this.src);"
                 loading="lazy">
             <button class="delete-btn" onclick="event.stopPropagation(); deleteMemory('${memory._id}')">×</button>
             <div class="time-elapsed">${getTimeElapsed(memory.uploadDate)}</div>

@@ -12,6 +12,23 @@ if (process.env.NODE_ENV === 'production') {
     require('dotenv').config();
 }
 
+// Create placeholder image if it doesn't exist
+const placeholderPath = path.join(__dirname, 'placeholder.jpg');
+if (!fs.existsSync(placeholderPath)) {
+    // Create a simple SVG as placeholder
+    const svgContent = `
+        <svg width="300" height="300" xmlns="http://www.w3.org/2000/svg">
+            <rect width="100%" height="100%" fill="#f0f0f0"/>
+            <text x="50%" y="50%" font-family="Arial" font-size="20" fill="#666" text-anchor="middle">
+                Ảnh không khả dụng
+            </text>
+        </svg>
+    `;
+    
+    // Write the SVG content to a file
+    fs.writeFileSync(placeholderPath.replace('.jpg', '.svg'), svgContent);
+}
+
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -65,6 +82,11 @@ app.get('/uploads/:filename', (req, res, next) => {
     } else {
         res.status(404).json({ message: 'Image not found' });
     }
+});
+
+// Serve placeholder SVG
+app.get('/placeholder.svg', (req, res) => {
+    res.sendFile(path.join(__dirname, 'placeholder.svg'));
 });
 
 // MongoDB Connection
