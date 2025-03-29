@@ -25,7 +25,9 @@ let memories = JSON.parse(localStorage.getItem('memories')) || [];
 let modal, modalImage, modalDate, modalTime, closeModal;
 
 // Thêm biến cho API URL
-const API_URL = window.location.origin + '/api';
+const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? window.location.origin + '/api'
+    : 'https://count-love-day-api.onrender.com/api';  // URL của Render
 
 // Khởi tạo các biến khi DOM đã sẵn sàng
 document.addEventListener('DOMContentLoaded', function() {
@@ -203,22 +205,45 @@ function handleImageUpload(event) {
 
     for (let file of files) {
         if (file.type.startsWith('image/')) {
+            // Kiểm tra kích thước file
+            if (file.size > 5 * 1024 * 1024) {
+                alert('File quá lớn. Giới hạn là 5MB');
+                continue;
+            }
+
             const formData = new FormData();
             formData.append('image', file);
+
+            // Hiển thị loading
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'loading-indicator';
+            loadingDiv.textContent = 'Đang tải ảnh lên...';
+            document.getElementById('memoriesGrid').prepend(loadingDiv);
 
             fetch(`${API_URL}/memories`, {
                 method: 'POST',
                 body: formData
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => Promise.reject(err));
+                }
+                return response.json();
+            })
             .then(memory => {
                 memories.push(memory);
                 displayMemories();
             })
             .catch(error => {
                 console.error('Error uploading image:', error);
-                alert('Có lỗi xảy ra khi upload ảnh');
+                alert(error.message || 'Có lỗi xảy ra khi tải ảnh');
+            })
+            .finally(() => {
+                // Xóa loading
+                loadingDiv.remove();
             });
+        } else {
+            alert('Chỉ chấp nhận file ảnh');
         }
     }
 }
