@@ -52,8 +52,20 @@ app.use((req, res, next) => {
 });
 
 app.use(express.json());
+// Serve static files
 app.use(express.static(path.join(__dirname, '../')));
+// Serve uploaded files
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Add a route to check if an image exists
+app.get('/uploads/:filename', (req, res, next) => {
+    const filePath = path.join(__dirname, 'uploads', req.params.filename);
+    if (fs.existsSync(filePath)) {
+        next();
+    } else {
+        res.status(404).json({ message: 'Image not found' });
+    }
+});
 
 // MongoDB Connection
 mongoose.connect(process.env.MONGODB_URI, {
@@ -135,7 +147,14 @@ app.get('/api/test', (req, res) => {
 app.get('/api/memories', async (req, res) => {
     try {
         const memories = await Memory.find().sort({ uploadDate: -1 });
-        res.json(memories);
+        // Chuyển đổi đường dẫn tương đối thành tuyệt đối cho các memories cũ
+        const memoriesWithFullPaths = memories.map(memory => ({
+            ...memory.toObject(),
+            image: memory.image.startsWith('http') 
+                ? memory.image 
+                : `https://love-count.onrender.com${memory.image}`
+        }));
+        res.json(memoriesWithFullPaths);
     } catch (error) {
         console.error('Error getting memories:', error);
         res.status(500).json({ message: error.message });
@@ -150,7 +169,7 @@ app.post('/api/memories', upload.single('image'), async (req, res) => {
         }
 
         const memory = new Memory({
-            image: `/uploads/${req.file.filename}`,
+            image: `https://love-count.onrender.com/uploads/${req.file.filename}`,  // Sử dụng URL đầy đủ
             date: new Date().toLocaleDateString('vi-VN'),
             uploadDate: new Date()
         });

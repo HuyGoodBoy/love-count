@@ -296,7 +296,10 @@ function displayMemories() {
 
     grid.innerHTML = memories.map(memory => `
         <div class="memory-item" data-id="${memory._id}">
-            <img src="${memory.image}" alt="Kỷ niệm">
+            <img src="${memory.image}" 
+                alt="Kỷ niệm" 
+                onerror="this.onerror=null; this.src='placeholder.jpg'; console.error('Failed to load image:', this.src);"
+                loading="lazy">
             <button class="delete-btn" onclick="event.stopPropagation(); deleteMemory('${memory._id}')">×</button>
             <div class="time-elapsed">${getTimeElapsed(memory.uploadDate)}</div>
             <div class="date">${memory.date}</div>
@@ -308,6 +311,15 @@ function displayMemories() {
     console.log('Found memory items:', memoryItems.length);
     
     memoryItems.forEach(item => {
+        const img = item.querySelector('img');
+        // Thêm class loading khi ảnh đang tải
+        img.classList.add('loading');
+        
+        // Xóa class loading khi ảnh tải xong
+        img.onload = function() {
+            this.classList.remove('loading');
+        };
+        
         item.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
