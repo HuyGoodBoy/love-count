@@ -348,15 +348,23 @@ function openImageModal(memoryId) {
 
 // Thêm hàm loadMemories
 function loadMemories() {
+    console.log('Fetching memories from:', `${API_URL}/memories`);
     fetch(`${API_URL}/memories`)
-        .then(response => response.json())
+        .then(response => {
+            console.log('Response status:', response.status);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
+            console.log('Received memories:', data);
             memories = data;
             displayMemories();
         })
         .catch(error => {
-            console.error('Error loading memories:', error);
-            alert('Có lỗi xảy ra khi tải ảnh');
+            console.error('Detailed error loading memories:', error);
+            alert(`Có lỗi xảy ra khi tải ảnh: ${error.message}`);
         });
 }
 

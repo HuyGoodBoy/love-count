@@ -16,16 +16,11 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 // Middleware
-app.use(cors({
-    origin: [
-        'http://localhost:3000',
-        'http://127.0.0.1:3000',
-        'https://huygoodboy.github.io',
-        'https://lover.huygoodboy.io.vn'  // Thêm domain của bạn
-    ],
-    methods: ['GET', 'POST', 'DELETE'],
-    credentials: true
-}));
+app.use(cors());  // Cho phép tất cả các origin tạm thời để test
+
+// Thêm middleware xử lý preflight requests
+app.options('*', cors());
+
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
