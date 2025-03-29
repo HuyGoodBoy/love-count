@@ -59,10 +59,25 @@ app.use((req, res, next) => {
 
 // Add security and CORS headers middleware
 app.use((req, res, next) => {
+    // CORS headers
     res.header('Access-Control-Allow-Origin', req.headers.origin);
     res.header('Access-Control-Allow-Methods', 'GET,POST,DELETE,OPTIONS');
     res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     res.header('Access-Control-Allow-Credentials', true);
+
+    // Security headers
+    res.header('X-Content-Type-Options', 'nosniff');
+    res.header('X-Frame-Options', 'SAMEORIGIN');
+    res.header('X-XSS-Protection', '1; mode=block');
+    res.header('Referrer-Policy', 'strict-origin-when-cross-origin');
+    res.header('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+    
+    // Remove browsing-topics from Permissions-Policy if present
+    const permissionsPolicy = res.getHeader('Permissions-Policy');
+    if (permissionsPolicy && permissionsPolicy.includes('browsing-topics')) {
+        res.header('Permissions-Policy', permissionsPolicy.replace(/,?\s*browsing-topics=[^,]*/, ''));
+    }
+
     next();
 });
 
