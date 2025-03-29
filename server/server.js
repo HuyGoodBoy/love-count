@@ -17,7 +17,11 @@ const port = process.env.PORT || 3000;
 
 // CORS Configuration
 const corsOptions = {
-    origin: ['https://lover.huygoodboy.io.vn', 'http://localhost:3000'],
+    origin: [
+        'https://lover.huygoodboy.io.vn',
+        'https://love-count.onrender.com',
+        'http://localhost:3000'
+    ],
     methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
@@ -120,6 +124,11 @@ const upload = multer({
 // Home route
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '../index.html'));
+});
+
+// Test route
+app.get('/api/test', (req, res) => {
+    res.json({ message: 'API is working!' });
 });
 
 // Get all memories
